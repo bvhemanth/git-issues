@@ -1,5 +1,5 @@
-<div class="card" (click)="route(data)">
-   <div>
+<div class="card" id="card" (click)="route(data)">
+   <div class="card__title">
         <img [src]="data.user.avatar_url" [alt]="data.user.type"/>
         {{data.title}} #{{data.number}} 
    </div>
@@ -8,8 +8,7 @@
             {{label.name}}
         </span>
     </a>
-    
-    <p>
+    <p class="card__summary">
         {{limit(data.body)}}
     </p>
     - {{data.user.login}}  

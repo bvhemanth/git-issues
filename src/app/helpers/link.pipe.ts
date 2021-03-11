@@ -10,8 +10,7 @@ export class LinkPipe implements PipeTransform {
   constructor(private _domSanitizer: DomSanitizer) {}
 
   transform(value: any, args?: any): any {
-    console.log(value);
-    console.log(args);
+
     this.link=args
     return this._domSanitizer.bypassSecurityTrustHtml(this.stylize(value),);
   }

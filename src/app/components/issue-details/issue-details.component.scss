@@ -1,20 +1,14 @@
-.card{
-    margin: 0.875rem;
-    border: 1px solid #ddd;
-    padding:0.875rem;
-    min-height: 12rem;
-    height: auto;
-    img{
-        height: 4rem;
+.wrapper{
+    margin:0 1rem;
+    &__card{
+        border: 1px solid #ddd;
+        padding:0.875rem;
+        min-height: 12rem;
+        height: auto;
+        img{
+            height: 4rem;
+        }
     }
-    .comment{
-        border:1px solid #ddd;
-    }
-    .comment-img{
-        height: 2rem;
-        border-radius: 100%;
-    }
-
 }
 
 .main{
@@ -27,10 +21,10 @@
         flex:30%;
         &__item{
             padding:.5rem 0;
+            font-size: .875rem;
             &__subtitle{
                 font-weight: 600;
                 color:#2a2d52;
-                font-size: .875rem;
                 margin-bottom: .5rem;
             }
         }
@@ -44,4 +38,8 @@
     line-height: 1.825rem;
     color:#000;
     text-decoration: none;
+}
+.comment-img{
+    height: 2rem;
+    border-radius: 100%;
 }

@@ -23,8 +23,6 @@ export class IssuesListComponent implements OnInit {
     this.get.getData().subscribe((data)=>{
       this.totalIssues = data;
       this.issues = this.totalIssues.slice(0,25);
-      console.log(this.totalIssues);
-      console.log(this.issues);
       }
     );
   }

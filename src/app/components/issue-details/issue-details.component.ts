@@ -14,7 +14,6 @@ export class IssueDetailsComponent implements OnInit {
     const navigation = this.route.getCurrentNavigation();
     if (navigation.extras.state) {
       this.issueDetails= navigation.extras.state.item;
-      console.log(navigation.extras.state.item);
     }
    }
 
