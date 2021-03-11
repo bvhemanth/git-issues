@@ -1,18 +1,23 @@
 <div class="card">
-    <img [src]="issueDetails.user.avatar_url" [alt]="issueDetails.user.type"/>
+    <!-- <img [src]="issueDetails.user.avatar_url" [alt]="issueDetails.user.type"/> -->
     <div>
         <h2>Title: {{issueDetails.title}} </h2>
         State: {{issueDetails.state}}
     </div>
 
     <div>
-        Labels: 
-        <span *ngFor="let label of issueDetails.labels" [ngStyle]="{'color': '#'+label.color}">
+        <span class="label" *ngFor="let label of issueDetails.labels" [ngStyle]="{'color': '#'+label.color}">
            {{label.name}} &nbsp;
         </span>
     </div>
     <div>
+        <b>Summary:</b>        
         {{issueDetails.body}}
     </div>
-
+    <ul>
+        <b>Comments:</b>
+        <li *ngFor="let comment of comments">
+            <img class="comment-img" [src]="comment.user.avatar_url"/> <p [innerHTML]="comment.body | link:comment.html_url"></p>
+        </li>
+    </ul>    
 </div>

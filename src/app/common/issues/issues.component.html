@@ -1,59 +1,20 @@
 <div class="card" (click)="route(data)">
-    <img [src]="data.user.avatar_url" [alt]="data.user.type"/>
-    Number: {{data.number}}
-
-    <div>
-        Title: {{data.title}}
-    </div>
-    <div>
-        Labels
-        <span *ngFor="let label of data.labels" [ngStyle]="{'color': '#'+label.color}">
-            {{label.name}} &nbsp;
-        </span>
-    </div>
-    <div>
-        {{data.user.login}}  
-    </div>
+   <div>
+        <img [src]="data.user.avatar_url" [alt]="data.user.type"/>
+        {{data.title}} #{{data.number}} 
+   </div>
+    <ul>
+        <li>
+            Labels
+            <span *ngFor="let label of data.labels" [ngStyle]="{'color': '#'+label.color}">
+                {{label.name}} &nbsp;
+            </span>
+        </li>
+        <li>
+            {{data.user.login}}  
+        </li>
+    </ul>
     <div>
         {{limit(data.body)}}
     </div>
 </div>
-
-
-<!-- <table class="table">
-    <thead>
-        <tr>
-            <th>
-                Number
-            </th>
-            <th>
-                Title
-            </th>
-            <th>
-                Labels
-            </th>
-            <th>
-                User
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor="let issue of data">
-            <td>
-                {{issue.number}} 
-            </td>
-            <td>
-                {{issue.title}}   
-            </td>
-            
-            <td>
-                <div *ngFor="let label of issue.labels" [ngStyle]="{'color': '#'+label.color}">
-                    {{label.name}} &nbsp;
-                </div>
-            </td>
-            <td>
-                {{issue.user?.login}}
-            </td>
-        </tr>
-    </tbody>
-</table> -->

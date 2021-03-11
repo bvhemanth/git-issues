@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { GetIssuesService } from 'src/app/services/get-issues.service';
 
 @Component({
   selector: 'app-issue-details',
@@ -8,7 +9,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class IssueDetailsComponent implements OnInit {
   issueDetails;
-  constructor(private route: Router) {
+  comments;
+  constructor(private route: Router,private get : GetIssuesService) {
     const navigation = this.route.getCurrentNavigation();
     if (navigation.extras.state) {
       this.issueDetails= navigation.extras.state.item;
@@ -17,6 +19,9 @@ export class IssueDetailsComponent implements OnInit {
    }
 
   ngOnInit(): void {
+    this.get.getComments(this.issueDetails.number).subscribe((data)=>{
+      this.comments=data;
+    })
   }
 
 }

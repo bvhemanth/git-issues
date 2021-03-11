@@ -14,4 +14,7 @@ export class GetIssuesService {
   getData(){
     return this.http.get(`${this.HostAPI}${this.BaseAPI}rails/rails/issues`);
   }
+  getComments(id){
+    return this.http.get(`https://api.github.com/repos/rails/rails/issues/${id}/comments`);
+  }
 }

@@ -8,12 +8,14 @@ import { FormsModule } from '@angular/forms';
 import { IssuesListComponent } from './components/issues-list/issues-list.component';
 import { IssuesComponent } from './common/issues/issues.component';
 import { IssueDetailsComponent } from './components/issue-details/issue-details.component';
+import { LinkPipe } from './helpers/link.pipe';
 @NgModule({
   declarations: [
     AppComponent,
     IssuesListComponent,
     IssuesComponent,
-    IssueDetailsComponent
+    IssueDetailsComponent,
+    LinkPipe
   ],
   imports: [
     BrowserModule,
