@@ -1,0 +1,28 @@
+.card{
+    margin: 0.875rem;
+    border: 1px solid #ddd;
+    padding:0.875rem;
+    min-height: 12rem;
+    max-height: 12rem;
+    img{
+        height: 4rem;
+    }
+    box-shadow: 3px 3px 5px #ddd;
+    border-radius:0.5rem;
+    transition: 1s;
+    &:hover{
+        transform: scale(1.05);
+    }
+    word-break: break-all ;
+}
+.table{
+    width: 100%;
+    border-collapse: collapse;
+    thead{
+        background-color: #2a2d52;
+        color:#fff;
+    }
+    // td{
+
+    // }
+}
