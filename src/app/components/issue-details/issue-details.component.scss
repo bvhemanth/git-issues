@@ -7,12 +7,41 @@
     img{
         height: 4rem;
     }
+    .comment{
+        border:1px solid #ddd;
+    }
     .comment-img{
         height: 2rem;
         border-radius: 100%;
     }
-    .label{
-        background-color: #8a8181;
-        padding:.2rem;
+
+}
+
+.main{
+    display:flex;
+    .descitpion
+    {
+        flex: 70%;
     }
+    .info{
+        flex:30%;
+        &__item{
+            padding:.5rem 0;
+            &__subtitle{
+                font-weight: 600;
+                color:#2a2d52;
+                font-size: .875rem;
+                margin-bottom: .5rem;
+            }
+        }
+    }
+}
+
+.label{
+    font-size:0.975rem;
+    border-radius:.5rem;
+    padding: .2rem .5rem;
+    line-height: 1.825rem;
+    color:#000;
+    text-decoration: none;
 }

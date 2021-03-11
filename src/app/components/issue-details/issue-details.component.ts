@@ -10,7 +10,7 @@ import { GetIssuesService } from 'src/app/services/get-issues.service';
 export class IssueDetailsComponent implements OnInit {
   issueDetails;
   comments;
-  constructor(private route: Router,private get : GetIssuesService) {
+  constructor(private route: Router,private getService : GetIssuesService) {
     const navigation = this.route.getCurrentNavigation();
     if (navigation.extras.state) {
       this.issueDetails= navigation.extras.state.item;
@@ -19,9 +19,10 @@ export class IssueDetailsComponent implements OnInit {
    }
 
   ngOnInit(): void {
-    this.get.getComments(this.issueDetails.number).subscribe((data)=>{
+    this.issueDetails.comments ?
+    this.getService.getComments(this.issueDetails.number).subscribe((data)=>{
       this.comments=data;
-    })
+    }) : this.issueDetails.comments;
   }
 
 }

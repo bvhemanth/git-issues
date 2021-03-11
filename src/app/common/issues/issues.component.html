@@ -3,18 +3,14 @@
         <img [src]="data.user.avatar_url" [alt]="data.user.type"/>
         {{data.title}} #{{data.number}} 
    </div>
-    <ul>
-        <li>
-            Labels
-            <span *ngFor="let label of data.labels" [ngStyle]="{'color': '#'+label.color}">
-                {{label.name}} &nbsp;
-            </span>
-        </li>
-        <li>
-            {{data.user.login}}  
-        </li>
-    </ul>
-    <div>
+    <a class="label" [ngStyle]="{'background-color': '#'+label.color}" *ngFor="let label of data.labels" >
+        <span>
+            {{label.name}}
+        </span>
+    </a>
+    
+    <p>
         {{limit(data.body)}}
-    </div>
+    </p>
+    - {{data.user.login}}  
 </div>
