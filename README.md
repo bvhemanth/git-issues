@@ -2,28 +2,35 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.0.5.
 
-## Development server
+step 1: use `git clone` to download project 
+step 2: then go to folder
+step 3: `npm i` // it lll install all packages
+step 4: `sudo ng serve --open`
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+now you ready to see the page on `browser`
 
-## Code scaffolding
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+# test cases
 
-## Build
+`ng test --code-coverage`
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+tested wit two different pages with two ways
 
-## Running unit tests
+## test list page 
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Give fdescribe which are related to list page
 
-## Running end-to-end tests
+issues-list.component.spec.ts
+issues.component.spec.ts
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+> ng test --code-coverage
 
-## Further help
+then 
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
-# git-issues
-# git-issues
+## test details page
+
+Give fdescribe which are related to details page
+
+issue-details.component.spec.ts
+
+> ng test --code-coverage 
