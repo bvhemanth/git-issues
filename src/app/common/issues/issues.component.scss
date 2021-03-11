@@ -20,8 +20,11 @@
     &__summary{
         font-size:0.875rem;
     }
+    &__author{
+        text-align: right;
+    }
     img{
-        height: 3rem;
+        height: 2.5rem;
         border-radius: 100%;
         float:right;
         border:2px solid #ddd;

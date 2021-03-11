@@ -2,7 +2,7 @@
     <div class="wrapper__card">
         <a [routerLink]="['/']">Back</a>
         <div>
-            <h2>{{issueDetails.title}} </h2>
+            <h2 class="wrapper__card__title">{{issueDetails.title}} </h2>
         </div>
         <div class="main">
             <div class="info">
@@ -15,7 +15,6 @@
                     </ng-container>
                     {{issueDetails.state}}
                 </div>
-            
                 <div class="info__item">
                     <div class="info__item__subtitle">    
                         Labels
@@ -23,7 +22,7 @@
                     <ng-container *ngIf="issueDetails.labels.length===0">
                         No labels
                     </ng-container>
-                    <a [href]="label.url" class="label"  target="_blank"
+                    <a [href]="label.url" class="info__item__subtitle__label"  target="_blank"
                         [ngStyle]="{'background-color': '#'+label.color}" *ngFor="let label of issueDetails.labels" >
                         <span >
                             {{label.name}}
@@ -47,21 +46,35 @@
                         {{issueDetails.updated_at | date}}
                     </div>
                  </div>
+                 <div class="info__item">
+                    <div class="info__item__subtitle">
+                        Closed
+                    </div>
+                    <ng-container *ngIf="!issueDetails.closed_at">
+                        Not Yet
+                    </ng-container>
+                    <div>
+                        {{issueDetails.closed_at | date}}
+                    </div>
+                 </div>
             </div>
             <div class="descitpion">
                 <b>Summary:</b>   
-                <p>   
+                <p class="description__body">   
                     {{issueDetails.body}}
                 </p>
+
+                <ng-container *ngIf="issueDetails.comments">
+                    <b>Comments:</b>
+                    <ul>
+                        <li *ngFor="let comment of comments" >
+                            <img class="comment-img" [src]="comment.user.avatar_url"  [alt]="comment.user.login"/> 
+                            <p class="comment-text" [innerHTML]="comment.body | link:comment.html_url"></p>
+                        </li>
+                    </ul>    
+                </ng-container>  
             </div>
         </div>
     </div>
-    <ng-container *ngIf="issueDetails.comments">
-        <b>Comments:</b>
-        <ul>
-            <li *ngFor="let comment of comments" >
-                <img class="comment-img" [src]="comment.user.avatar_url"   [alt]="comment.user.login"/> <p [innerHTML]="comment.body | link:comment.html_url"></p>
-            </li>
-        </ul>    
-    </ng-container>    
+  
 </div>

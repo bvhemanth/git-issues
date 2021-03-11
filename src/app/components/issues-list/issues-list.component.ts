@@ -9,7 +9,7 @@ import { Issue } from 'src/app/models/issue.interface';
 export class IssuesListComponent implements OnInit {
   issues: Issue[]=[];
   totalIssues;
-
+  loader:boolean=true;
   @HostListener("window:scroll", ['$event'])
   onScroll(event:any) {
      if (this.bottomReached()) {
@@ -23,6 +23,7 @@ export class IssuesListComponent implements OnInit {
     this.get.getData().subscribe((data)=>{
       this.totalIssues = data;
       this.issues = this.totalIssues.slice(0,25);
+      this.loader=false;
       }
     );
   }
@@ -32,10 +33,12 @@ export class IssuesListComponent implements OnInit {
   }
   
   attachData(){
-    if(this.issues.length === this.totalIssues.length){
-      return false;
+    if(!!this.totalIssues){
+      if(this.issues?.length === this.totalIssues?.length){
+        return false;
+      }
+      this.issues.push(...this.totalIssues.slice(this.issues.length, this.issues.length+25));
+      return true;   
     }
-    this.issues.push(...this.totalIssues.slice(this.issues.length, this.issues.length+25));
-    return true;   
   }
 }

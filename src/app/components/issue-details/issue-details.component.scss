@@ -1,10 +1,18 @@
 .wrapper{
-    margin:0 1rem;
+    margin:0 2rem;
     &__card{
         border: 1px solid #ddd;
+        box-shadow: 2px 3px 5px #ddd;
+        border-radius: .5rem;
         padding:0.875rem;
         min-height: 12rem;
         height: auto;
+        &__title{
+            background-color: #2a2d52;
+            color:#fff;
+            line-height: 2.5rem;
+            text-align: center;
+        }
         img{
             height: 4rem;
         }
@@ -16,6 +24,9 @@
     .descitpion
     {
         flex: 70%;
+        &__body{
+            font-size: 0.875rem;
+        }
     }
     .info{
         flex:30%;
@@ -26,20 +37,24 @@
                 font-weight: 600;
                 color:#2a2d52;
                 margin-bottom: .5rem;
+                &__label{
+                    font-size:0.975rem;
+                    border-radius:.5rem;
+                    padding: .2rem .5rem;
+                    line-height: 1.825rem;
+                    color:#000;
+                    text-decoration: none;
+                }
             }
         }
     }
 }
 
-.label{
-    font-size:0.975rem;
-    border-radius:.5rem;
-    padding: .2rem .5rem;
-    line-height: 1.825rem;
-    color:#000;
-    text-decoration: none;
-}
 .comment-img{
     height: 2rem;
     border-radius: 100%;
+    border: 2px solid #ddd;
+}
+.comment-text{
+    font-size: 0.875rem;
 }
