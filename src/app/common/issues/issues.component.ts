@@ -8,10 +8,11 @@ import { Router } from '@angular/router';
 })
 export class IssuesComponent implements OnInit {
   @Input('data') data;
+  
   constructor(private router: Router) { }
 
   ngOnInit(): void {
-    console.log(this.data)
+    //console.log(this.data)
   }
   route(data){
     this.router.navigateByUrl(`/issue/${data.number}`, { state: { item: data }});
