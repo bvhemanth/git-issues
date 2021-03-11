@@ -19,10 +19,13 @@ export class LinkPipe implements PipeTransform {
     if (text && text.length > 0) {
       for (let t of text.split(" ")) {
         if (t.startsWith("@") && t.length>1)
-          stylizedText += `<a href="${this.link}" target="_blank">${t}</a> `;
-        else
-          stylizedText += t + " ";
-      }
+          {
+            stylizedText += `<a href="${this.link}" target="_blank">${t}</a> `;
+          }
+          else{
+            stylizedText += t + " ";
+          }
+        }
       return stylizedText;
     }
     else return text;

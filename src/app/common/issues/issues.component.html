@@ -1,7 +1,7 @@
 <div class="card" id="card" (click)="route(data)">
    <div class="card__title">
         <img [src]="data.user.avatar_url" [alt]="data.user.type"/>
-        {{data.title}} #{{data.number}} 
+        {{data.title}} <span class="card__title__number">#{{data.number}}</span> 
    </div>
     <a class="label" [ngStyle]="{'background-color': '#'+label.color}" *ngFor="let label of data.labels" >
         <span>

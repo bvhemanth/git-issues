@@ -5,7 +5,6 @@
         div{
             margin-left: auto;
             margin-right: auto;
-            width:33.333333%;
             float:left;
         }
     }
@@ -52,3 +51,41 @@
     }
 }
   
+
+ /* Small devices (portrait tablets and large phones, 600px and up) */
+ @media only screen and (min-width: 600px) {
+  @media only screen and (min-width: 768px) {
+      .main{
+          div{
+              max-width: 50%;
+              max-height: 30rem;
+          }
+      }
+  } 
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px) {
+  .wrapper{
+    margin: 0 .6rem;
+    .list{
+        display:block;
+        div{
+            width:50%;
+        }
+    }
+  }
+} 
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) {
+  .wrapper{
+    margin: 0 .6rem;
+    .list{
+        display:block;
+        div{
+            width:33%;
+        }
+    }
+  }
+} 

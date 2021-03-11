@@ -16,6 +16,9 @@
     }
     &__title{
         font-weight: 600;
+        &__number{
+            color: #5794d3;
+        }
     }
     &__summary{
         font-size:0.875rem;

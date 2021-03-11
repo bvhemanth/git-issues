@@ -58,16 +58,20 @@
                     </div>
                  </div>
             </div>
-            <div class="descitpion">
+            <div class="description">
                 <b>Summary:</b>   
                 <p class="description__body">   
+                    
+                    <a [href]="issueDetails.user.html_url" target="_blank">
+                        <img class="description__body__avatar" [src]="issueDetails.user.avatar_url" [alt]="issueDetails.user.type"/>
+                    </a>
                     {{issueDetails.body}}
                 </p>
 
                 <ng-container *ngIf="issueDetails.comments">
                     <b>Comments:</b>
-                    <ul>
-                        <li *ngFor="let comment of comments" >
+                    <ul class="timeline">
+                        <li class="node" *ngFor="let comment of comments" >
                             <img class="comment-img" [src]="comment.user.avatar_url"  [alt]="comment.user.login"/> 
                             <p class="comment-text" [innerHTML]="comment.body | link:comment.html_url"></p>
                         </li>
