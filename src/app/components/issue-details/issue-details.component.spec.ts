@@ -68,6 +68,7 @@ fdescribe('IssueDetailsComponent', () => {
   let mockActiveRoute;
   let debugElement: DebugElement;
   let router: jasmine.SpyObj<Router>;
+  
   beforeEach(async(() => {
     mockActiveRoute = {
       snapshot: {
