@@ -2,7 +2,7 @@
     <div class="wrapper__card">
         <a [routerLink]="['/']">Back</a>
         <div>
-            <h2 class="wrapper__card__title">{{issueDetails.title}} </h2>
+            <h2 class="wrapper__card__title">{{issueDetails?.title}} </h2>
         </div>
         <div class="main">
             <div class="info">
@@ -10,20 +10,20 @@
                     <div class="info__item__subtitle">
                         Status
                     </div>
-                    <ng-container *ngIf="issueDetails.state===''">
+                    <ng-container *ngIf="issueDetails?.state===''">
                         No State
                     </ng-container>
-                    {{issueDetails.state}}
+                    {{issueDetails?.state}}
                 </div>
                 <div class="info__item">
                     <div class="info__item__subtitle">    
                         Labels
                     </div>
-                    <ng-container *ngIf="issueDetails.labels.length===0">
+                    <ng-container *ngIf="issueDetails?.labels.length===0">
                         No labels
                     </ng-container>
-                    <a [href]="label.url" class="info__item__subtitle__label"  target="_blank"
-                        [ngStyle]="{'background-color': '#'+label.color}" *ngFor="let label of issueDetails.labels" >
+                    <a [href]="label?.url" class="info__item__subtitle__label"  target="_blank"
+                        [ngStyle]="{'background-color': '#'+label.color}" *ngFor="let label of issueDetails?.labels" >
                         <span >
                             {{label.name}}
                         </span>
@@ -34,7 +34,7 @@
                         Created
                     </div>
                     <div>
-                        {{issueDetails.created_at | date}}
+                        {{issueDetails?.created_at | date}}
                     </div>
                 </div>
                 
@@ -43,18 +43,18 @@
                         Update
                     </div>
                     <div>
-                        {{issueDetails.updated_at | date}}
+                        {{issueDetails?.updated_at | date}}
                     </div>
                  </div>
                  <div class="info__item">
                     <div class="info__item__subtitle">
                         Closed
                     </div>
-                    <ng-container *ngIf="!issueDetails.closed_at">
+                    <ng-container *ngIf="!issueDetails?.closed_at">
                         Not Yet
                     </ng-container>
                     <div>
-                        {{issueDetails.closed_at | date}}
+                        {{issueDetails?.closed_at | date}}
                     </div>
                  </div>
             </div>
@@ -62,13 +62,13 @@
                 <b>Summary:</b>   
                 <p class="description__body">   
                     
-                    <a [href]="issueDetails.user.html_url" target="_blank" [title]="issueDetails.user.login">
-                        <img class="description__body__avatar" [src]="issueDetails.user.avatar_url" [alt]="issueDetails.user.type"/>
+                    <a [href]="issueDetails?.user?.html_url" target="_blank" [title]="issueDetails?.user?.login">
+                        <img class="description__body__avatar" [src]="issueDetails?.user?.avatar_url" [alt]="issueDetails?.user.type"/>
                     </a>
-                    {{issueDetails.body}}
+                    {{issueDetails?.body}}
                 </p>
 
-                <ng-container *ngIf="issueDetails.comments">
+                <ng-container *ngIf="issueDetails?.comments">
                     <b>Comments:</b>
                     <ul class="timeline">
                         <li class="node" *ngFor="let comment of comments" >
@@ -80,6 +80,10 @@
                 </ng-container>  
             </div>
         </div>
+    </div>  
+</div>
+
+<div class="parent" *ngIf="loader">
+    <div class="loader">
     </div>
-  
 </div>

@@ -17,4 +17,7 @@ export class GetIssuesService {
   getComments(id){
     return this.http.get(`https://api.github.com/repos/rails/rails/issues/${id}/comments`);
   }
+  getIssueDetails(number){
+    return this.http.get(`https://api.github.com/repos/rails/rails/issues/${number}`);
+  }
 }
