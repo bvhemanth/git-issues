@@ -26,3 +26,17 @@ export interface Issue {
     url:string;
     user?: {}
 }
+
+export interface Comment{
+    author_association:string;
+    body: string;
+    created_at:string;
+    html_url?: string;
+    id?: number;
+    issue_url?:string;
+    node_id:string;
+    performed_via_github_app?;
+    updated_at?:string;
+    url:string;
+    user?:{} 
+}

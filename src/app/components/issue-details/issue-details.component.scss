@@ -46,6 +46,7 @@
                     font-size:0.975rem;
                     border-radius:.5rem;
                     padding: .2rem .5rem;
+                    margin-right: .6rem;
                     line-height: 1.825rem;
                     color:#000;
                     text-decoration: none;
@@ -63,7 +64,9 @@
 .comment-text{
     font-size: 0.875rem;
 }
-
+.comment-date{
+    color:#3a3e40;
+}
 .timeline {
     margin-left: .5rem;
     border-left: .2rem solid #ddd;

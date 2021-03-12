@@ -1,15 +1,22 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
 import { GetIssuesService } from 'src/app/services/get-issues.service';
 import { Issue } from 'src/app/models/issue.interface';
+import { HttpErrorResponse } from '@angular/common/http';
+import { debounceTime, catchError, takeUntil } from 'rxjs/operators';
+import { throwError, pipe, Subject } from 'rxjs';
+
 @Component({
   selector: 'app-issues-list',
   templateUrl: './issues-list.component.html',
   styleUrls: ['./issues-list.component.scss']
 })
-export class IssuesListComponent implements OnInit {
+export class IssuesListComponent implements OnInit , OnDestroy{
   issues: Issue[]=[];
-  totalIssues;
   loader:boolean=true;
+  per_page=25;
+  page=1;
+  private readonly destroy$ = new Subject();
+
   @HostListener("window:scroll", ['$event'])
   onScroll(event:any) {
      if (this.bottomReached()) {
@@ -20,25 +27,39 @@ export class IssuesListComponent implements OnInit {
   constructor(private get : GetIssuesService) { }
 
   ngOnInit(): void {
-    this.get.getData().subscribe((data)=>{
-      this.totalIssues = data;
-      this.issues = this.totalIssues.slice(0,25);
-      this.loader=false;
+    this.getlist(this.page);
+  }
+  getlist(pagenumber){
+    this.loader=true;
+    this.get.getData(pagenumber,this.per_page).pipe(
+      takeUntil(this.destroy$),
+      debounceTime(300,),
+      catchError((error: HttpErrorResponse) => {
+        return throwError(error);
+      })
+      ).subscribe((data)=>{
+        if(data){
+          let list= data; 
+          this.issues.push(...JSON.parse(JSON.stringify(list))); 
+          this.loader=false;
+        }
       }
     );
   }
 
   bottomReached(): boolean {
-    return (window.innerHeight + window.scrollY) >= document.body.offsetHeight;
+    return (window.innerHeight + window.scrollY) >= document.body.scrollHeight;
   }
   
   attachData(){
-    if(!!this.totalIssues){
-      if(this.issues?.length === this.totalIssues?.length){
-        return false;
-      }
-      this.issues.push(...this.totalIssues.slice(this.issues.length, this.issues.length+25));
-      return true;   
-    }
+    
+    this.page++;
+    this.getlist(this.page);
+    //return true;   
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();//to destroy service when component end
   }
 }

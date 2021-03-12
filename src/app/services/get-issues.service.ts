@@ -11,8 +11,8 @@ export class GetIssuesService {
 
   constructor(private http:HttpClient) { }
 
-  getData(){
-    return this.http.get(`${this.HostAPI}${this.BaseAPI}rails/rails/issues`);
+  getData(page,per_page){
+    return this.http.get(`${this.HostAPI}${this.BaseAPI}rails/rails/issues?page=${page}&per_page=${per_page}   `);
   }
   getComments(id){
     return this.http.get(`https://api.github.com/repos/rails/rails/issues/${id}/comments`);

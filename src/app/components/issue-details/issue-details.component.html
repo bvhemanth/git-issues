@@ -73,7 +73,8 @@
                     <ul class="timeline">
                         <li class="node" *ngFor="let comment of comments" >
                             <img class="comment-img" [src]="comment.user.avatar_url"  [alt]="comment.user.login"/> 
-                            <p class="comment-text" [innerHTML]="comment.body | link:comment.html_url"></p>
+                            <span class="comment-date">Commented on {{comment.updated_at | date:'short'}}</span>
+                            <p class="comment-text" [innerHTML]="comment.body | link:comment.user.html_url"></p>
                         </li>
                     </ul>    
                 </ng-container>  

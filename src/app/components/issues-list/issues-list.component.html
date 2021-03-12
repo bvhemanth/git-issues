@@ -5,7 +5,13 @@
             <app-issues [data]="data"></app-issues>
         </div>
     </div>
+    <div class="count">
+        {{this.issues.length}}
+    </div>
 </div>
 
-<div class="loader" *ngIf="loader"><div></div><div></div><div></div><div></div>
+<div class="parent" *ngIf="loader">
+    <div class="loader">
+    </div>
 </div>
+
