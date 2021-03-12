@@ -5,6 +5,8 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { GetIssuesService } from 'src/app/services/get-issues.service';
 import { of } from 'rxjs';
+import { IssuesComponent } from 'src/app/common/issues/issues.component';
+import { Router } from '@angular/router';
 
 fdescribe('IssuesListComponent', () => {
   let component: IssuesListComponent;
@@ -13,9 +15,11 @@ fdescribe('IssuesListComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports:[HttpClientTestingModule],
-      declarations: [ IssuesListComponent ],
+      declarations: [ IssuesListComponent,
+      IssuesComponent ],
         providers:[
         { provide: GetIssuesService, useClass: MockSerivce },
+        { provide: Router, useValue: new MockRouterSecondary('/issue/41657') },
       ],
       schemas:[NO_ERRORS_SCHEMA]
     })
@@ -32,20 +36,38 @@ fdescribe('IssuesListComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('shoud call servive and get data',()=>{
+  it('shoud call mockervice and get data',()=>{
     spyOn(component,'getlist');
     component.ngOnInit();
     fixture.detectChanges();
     expect(component.getlist).toHaveBeenCalled();
   })
-  it('should call attach data api on scroll',()=>{
+  it('should send initial pagenumber as 1',()=>{
     spyOn(component,'getlist');
-    window.dispatchEvent(new Event('scroll'));
+    component.ngOnInit();
     fixture.detectChanges();
-    expect(component.getlist).toHaveBeenCalled();
-  })
+    expect(component.page).toEqual(1);
+  });
+
+  it('should have the other component', async(() => {
+    const fixture = TestBed.createComponent(IssuesListComponent);
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('app-issues')).not.toBe(null);
+  }));
 });
 
+export class MockRouterSecondary{
+  public url = '/issue/41657';
+
+  constructor(urlArgs) {
+    this.url = urlArgs;
+  }
+
+  navigateByUrl(url: string) {
+    return url;
+  }
+}
 
 export class MockSerivce{
   
@@ -163,158 +185,6 @@ export class MockSerivce{
             "patch_url": "https://github.com/rails/rails/pull/41656.patch"
           },
           "body": "# Experiment: Add Nokogiri dependency to Action View\r\n\r\nThere is already an ActionText implementation-side dependency on Nokogiri. ActionText is an optional dependency of Rails, but since 7.0 is a major version bump from 6.1, it feels like an appropriate time to experiment with something like this.\r\n\r\nThis work is in parallel and support of https://github.com/rails/rails/pull/41638. If this proves to be viable, we could consider returning `Nokogiri::XML::Node` extensions from these helpers instead of Strings so that ERB templates or View Helpers can have instance-level access prior to encoding them to response HTML content.\r\n\r\n# Summary\r\n\r\nActionView: Implement Tag Helpers with Nokogiri\r\n---\r\n    \r\nImplement `tag` and `content_tag` helpers as wrappers around\r\n[Nokogiri::XML::Node#to_html][].\r\n\r\n[Nokogiri::XML::Node#to_html]: https://nokogiri.org/rdoc/Nokogiri/XML/Node.html#to_html-instance_method\r\n\r\ns/href/title/ to avoid URL _and_ HTML escaping\r\n---\r\n    \r\nSince Nokogiri is responsible for transforming nodes into HTML, it's\r\nstrict handling of the `[href]` attribute is _URL_ escaping values,\r\nwhich was not occurring in the prior tests.\r\n\r\nIn an effort to exercise the code in the same spirit as the original\r\ncoverage, replace the `href:` assignments with `title:` assignments,\r\nsince they're both attributes but a `title` has no restrictions on\r\nformat or validity.\r\n\r\n### Other Information\r\n\r\nIn its current form, there are still two classes of test failure: escaping and encoding.\r\n\r\n```\r\nFailure:\r\nTagHelperTest#test_content_tag_with_unescaped_conditional_hash_classes [/Users/seanpdoyle/Work/rails/rails/actionview/test/template/tag_helper_test.rb:334]:\r\n--- expected\r\n+++ actual\r\n@@ -1 +1 @@\r\n-\"<p class=\\\"song play>\\\">limelight</p>\"\r\n+\"<p class=\\\"song play&gt;\\\">limelight</p>\"\r\n```\r\n\r\nThere are tests that assert that attributes marked as `#html_safe` won't be escaped, even if they would result in invalid HTML. For example, the failure above is expecting that the `>` character exist in the attribute instead of the `&gt;`, even though `>` would close the opening `<p` portion of the HTML syntax.\r\n\r\n```\r\nFailure:                                                                       \r\nFormCollectionsHelperTest#test_collection_radio_generates_labels_for_non-English_values_correctly [/Users/seanpdoyle/Work/rails/rails/actionview/test/template\r\n/form_collections_helper_test.rb:46]:                                          \r\n<Господин> expected but was                                                                                                                                   <ÐÐ¾ÑÐ¿Ð¾Ð´Ð¸Ð½>..                                                                                                                                          Expected 0 to be >= 1.\r\n\r\nFailure:                                                                                                                                                      \r\nUrlHelperTest#test_link_tag_with_html_safe_string [/Users/seanpdoyle/Work/rails/rails/actionview/test/template/url_helper_test.rb:498]:                       \r\nExpected: <a href=\"/article/Gerd_M%C3%BCller\">Gerd Müller</a>                                                                                                 \r\nActual: <a href=\"/article/Gerd_M%C3%BCller\">Gerd M&Atilde;&frac14;ller</a>  \r\n```\r\n\r\nI'm unsure whether or not Nokogiri's formatting can be configured to account for these situations.\r\n\r\n### Open Questions\r\n\r\nI'm a little unsure about the performance characteristics of instantiating Nokogiri instances instead of allocating and concatenating Strings. My gut tells me that it might be possible for the replacement to be a net-zero change, but I'm curious how the two will compare to one another.\r\n\r\nHaving said that, are there any red flags that I'm missing that are worth considering ahead of time? Any showstoppers you all might have more context and history on?\r\n\r\nCurrently, Action Text has a hard dependency on Nokogiri, but Action View does not. What is the history behind that decision? Does the release of nokogiri@1.11.0 and its bundled pre-compiled libraries make an Action View dependency on Nokogiri more palatable?\r\n\r\nIf this proves to be viable, what other logic and HTML validation code would we be able to drop from the suite of ActionView::Helpers?",
-          "performed_via_github_app": null
-        },
-        {
-          "url": "https://api.github.com/repos/rails/rails/issues/41655",
-          "repository_url": "https://api.github.com/repos/rails/rails",
-          "labels_url": "https://api.github.com/repos/rails/rails/issues/41655/labels{/name}",
-          "comments_url": "https://api.github.com/repos/rails/rails/issues/41655/comments",
-          "events_url": "https://api.github.com/repos/rails/rails/issues/41655/events",
-          "html_url": "https://github.com/rails/rails/issues/41655",
-          "id": 828625420,
-          "node_id": "MDU6SXNzdWU4Mjg2MjU0MjA=",
-          "number": 41655,
-          "title": "rails6.1.1 counter_cache conflict lock_version when destroy a object",
-          "user": {
-            "login": "Guoxweii",
-            "id": 689550,
-            "node_id": "MDQ6VXNlcjY4OTU1MA==",
-            "avatar_url": "https://avatars.githubusercontent.com/u/689550?v=4",
-            "gravatar_id": "",
-            "url": "https://api.github.com/users/Guoxweii",
-            "html_url": "https://github.com/Guoxweii",
-            "followers_url": "https://api.github.com/users/Guoxweii/followers",
-            "following_url": "https://api.github.com/users/Guoxweii/following{/other_user}",
-            "gists_url": "https://api.github.com/users/Guoxweii/gists{/gist_id}",
-            "starred_url": "https://api.github.com/users/Guoxweii/starred{/owner}{/repo}",
-            "subscriptions_url": "https://api.github.com/users/Guoxweii/subscriptions",
-            "organizations_url": "https://api.github.com/users/Guoxweii/orgs",
-            "repos_url": "https://api.github.com/users/Guoxweii/repos",
-            "events_url": "https://api.github.com/users/Guoxweii/events{/privacy}",
-            "received_events_url": "https://api.github.com/users/Guoxweii/received_events",
-            "type": "User",
-            "site_admin": false
-          },
-          "labels": [
-      
-          ],
-          "state": "open",
-          "locked": false,
-          "assignee": null,
-          "assignees": [
-      
-          ],
-          "milestone": null,
-          "comments": 0,
-          "created_at": "2021-03-11T02:36:36Z",
-          "updated_at": "2021-03-11T02:56:54Z",
-          "closed_at": null,
-          "author_association": "NONE",
-          "active_lock_reason": null,
-          "body": "### Steps to reproduce\r\n\r\n### System configuration\r\n**Rails version**:  6.1.1\r\n\r\n**Ruby version**: 2.7.2\r\n\r\n#### Example\r\n\r\n~~~\r\nclass Post\r\n  has_many :comments, dependent: :destroy, counter_cache: \"comments_count\"\r\nend\r\n\r\nclass Comment\r\n  lock_version # has a lock_version column\r\n  belongs_to :post, counter_cache: \"comments_count\", touch: true\r\nend\r\n\r\n~~~\r\n\r\n**when i destroy a Comment object, the relate Post object's counter_cache won't trigger.**\r\n\r\nDebug result:\r\n\r\nwhen destroy a Comment object, \r\n \r\npath: activerecord-6.1.1/lib/active_record/locking/optimistic.rb\r\n\r\n~~~\r\n     def destroy_row\r\n          return super unless locking_enabled?\r\n\r\n          locking_column = self.class.locking_column\r\n\r\n          affected_rows = self.class._delete_record(\r\n            @primary_key => id_in_database,\r\n            locking_column => attribute_before_type_cast(locking_column)\r\n          )\r\n\r\n          if affected_rows != 1\r\n            raise ActiveRecord::StaleObjectError.new(self, \"destroy\")\r\n          end\r\n\r\n          affected_rows\r\n        end\r\n~~~\r\n\r\nbecause Comment model has a lock_version, so the locking_enabled? is true\r\n\r\n~~~ ruby\r\nreturn super unless locking_enabled?\r\n~~~\r\n\r\nso super(CounterCache's destroy_row function) not trigger, and the count_cache decrease not trigger.\r\n\r\nhow can l resolve the problem? \r\n\r\n",
-          "performed_via_github_app": null
-        },
-        {
-          "url": "https://api.github.com/repos/rails/rails/issues/41654",
-          "repository_url": "https://api.github.com/repos/rails/rails",
-          "labels_url": "https://api.github.com/repos/rails/rails/issues/41654/labels{/name}",
-          "comments_url": "https://api.github.com/repos/rails/rails/issues/41654/comments",
-          "events_url": "https://api.github.com/repos/rails/rails/issues/41654/events",
-          "html_url": "https://github.com/rails/rails/pull/41654",
-          "id": 828502573,
-          "node_id": "MDExOlB1bGxSZXF1ZXN0NTkwMzA0MTMz",
-          "number": 41654,
-          "title": "Active Storage: `Blob` creation shouldn't crash if no service selected",
-          "user": {
-            "login": "ghiculescu",
-            "id": 509837,
-            "node_id": "MDQ6VXNlcjUwOTgzNw==",
-            "avatar_url": "https://avatars.githubusercontent.com/u/509837?v=4",
-            "gravatar_id": "",
-            "url": "https://api.github.com/users/ghiculescu",
-            "html_url": "https://github.com/ghiculescu",
-            "followers_url": "https://api.github.com/users/ghiculescu/followers",
-            "following_url": "https://api.github.com/users/ghiculescu/following{/other_user}",
-            "gists_url": "https://api.github.com/users/ghiculescu/gists{/gist_id}",
-            "starred_url": "https://api.github.com/users/ghiculescu/starred{/owner}{/repo}",
-            "subscriptions_url": "https://api.github.com/users/ghiculescu/subscriptions",
-            "organizations_url": "https://api.github.com/users/ghiculescu/orgs",
-            "repos_url": "https://api.github.com/users/ghiculescu/repos",
-            "events_url": "https://api.github.com/users/ghiculescu/events{/privacy}",
-            "received_events_url": "https://api.github.com/users/ghiculescu/received_events",
-            "type": "User",
-            "site_admin": false
-          },
-          "labels": [
-            {
-              "id": 664533972,
-              "node_id": "MDU6TGFiZWw2NjQ1MzM5NzI=",
-              "url": "https://api.github.com/repos/rails/rails/labels/activestorage",
-              "name": "activestorage",
-              "color": "bfd4f2",
-              "default": false,
-              "description": null
-            }
-          ],
-          "state": "open",
-          "locked": false,
-          "assignee": {
-            "login": "georgeclaghorn",
-            "id": 94129,
-            "node_id": "MDQ6VXNlcjk0MTI5",
-            "avatar_url": "https://avatars.githubusercontent.com/u/94129?v=4",
-            "gravatar_id": "",
-            "url": "https://api.github.com/users/georgeclaghorn",
-            "html_url": "https://github.com/georgeclaghorn",
-            "followers_url": "https://api.github.com/users/georgeclaghorn/followers",
-            "following_url": "https://api.github.com/users/georgeclaghorn/following{/other_user}",
-            "gists_url": "https://api.github.com/users/georgeclaghorn/gists{/gist_id}",
-            "starred_url": "https://api.github.com/users/georgeclaghorn/starred{/owner}{/repo}",
-            "subscriptions_url": "https://api.github.com/users/georgeclaghorn/subscriptions",
-            "organizations_url": "https://api.github.com/users/georgeclaghorn/orgs",
-            "repos_url": "https://api.github.com/users/georgeclaghorn/repos",
-            "events_url": "https://api.github.com/users/georgeclaghorn/events{/privacy}",
-            "received_events_url": "https://api.github.com/users/georgeclaghorn/received_events",
-            "type": "User",
-            "site_admin": false
-          },
-          "assignees": [
-            {
-              "login": "georgeclaghorn",
-              "id": 94129,
-              "node_id": "MDQ6VXNlcjk0MTI5",
-              "avatar_url": "https://avatars.githubusercontent.com/u/94129?v=4",
-              "gravatar_id": "",
-              "url": "https://api.github.com/users/georgeclaghorn",
-              "html_url": "https://github.com/georgeclaghorn",
-              "followers_url": "https://api.github.com/users/georgeclaghorn/followers",
-              "following_url": "https://api.github.com/users/georgeclaghorn/following{/other_user}",
-              "gists_url": "https://api.github.com/users/georgeclaghorn/gists{/gist_id}",
-              "starred_url": "https://api.github.com/users/georgeclaghorn/starred{/owner}{/repo}",
-              "subscriptions_url": "https://api.github.com/users/georgeclaghorn/subscriptions",
-              "organizations_url": "https://api.github.com/users/georgeclaghorn/orgs",
-              "repos_url": "https://api.github.com/users/georgeclaghorn/repos",
-              "events_url": "https://api.github.com/users/georgeclaghorn/events{/privacy}",
-              "received_events_url": "https://api.github.com/users/georgeclaghorn/received_events",
-              "type": "User",
-              "site_admin": false
-            }
-          ],
-          "milestone": null,
-          "comments": 0,
-          "created_at": "2021-03-11T00:05:54Z",
-          "updated_at": "2021-03-11T02:11:55Z",
-          "closed_at": null,
-          "author_association": "CONTRIBUTOR",
-          "active_lock_reason": null,
-          "pull_request": {
-            "url": "https://api.github.com/repos/rails/rails/pulls/41654",
-            "html_url": "https://github.com/rails/rails/pull/41654",
-            "diff_url": "https://github.com/rails/rails/pull/41654.diff",
-            "patch_url": "https://github.com/rails/rails/pull/41654.patch"
-          },
-          "body": "https://github.com/rails/rails/issues/41653 noted an issue where if there's service configured (`config.active_storage.service` is commented out), Blob creation via direct upload crashes:\r\n\r\n```\r\nStarted POST \"/rails/active_storage/direct_uploads\" for ::1 at 2021-03-09 13:02:57 -0800\r\nProcessing by ActiveStorage::DirectUploadsController#create as JSON\r\n  Parameters: {\"blob\"=>{\"filename\"=>\"banana.jpg\", \"content_type\"=>\"image/jpeg\", \"byte_size\"=>577085, \"checksum\"=>\"W/vo/JqBNmJHMCaL+PRlBQ==\"}, \"direct_upload\"=>{\"blob\"=>{\"filename\"=>\"banana.jpg\", \"content_type\"=>\"image/jpeg\", \"byte_size\"=>577085, \"checksum\"=>\"W/vo/JqBNmJHMCaL+PRlBQ==\"}}}\r\nCompleted 500 Internal Server Error in 12ms (ActiveRecord: 3.3ms | Allocations: 5864)\r\n\r\nNoMethodError (undefined method `name' for nil:NilClass):\r\n\r\nactivestorage (6.1.3) app/models/active_storage/blob.rb:52:in `block in <class:Blob>'\r\nactivesupport (6.1.3) lib/active_support/callbacks.rb:427:in `instance_exec'\r\n```\r\n\r\nThis PR fixes that crash. Blob creation will still fail, but with a more informative error about a `service_name` being required.\r\n\r\nFixes https://github.com/rails/rails/issues/41653",
           "performed_via_github_app": null
         },
         {
@@ -1666,199 +1536,6 @@ export class MockSerivce{
           "body": "Recently I've upgraded an application from rails 5.2 to 6.1.3, following the steps suggested in the rails guides: https://edgeguides.rubyonrails.org/upgrading_ruby_on_rails.html\r\nThe Process went fine the rails project was successfully upgraded.\r\n\r\nTo proceed with the upgrade on the project we chose to add Webpacker to the project, following the same steps described on the guide and also in the Github from Webpacker.\r\n* Adding the gem in the Gemfile\r\n`gem 'webpacker'`\r\n* Running the following in the console\r\n`bundle install`\r\n`bundle exec rails webpacker:install`\r\n\r\n### Expected behavior\r\nWebpacker should be installed with minor impact to the project since the assets are still being loaded properly.\r\n### Actual behavior\r\nMost of the routes were broken, mainly rails don't find the controller either action for a specific endpoint and they are set to `nil` when running `rails routes`.\r\nThe only routes shown in the `rails routes` output are the ones with the `to:` param in the `routes.rb`.\r\n\r\n### Rails routes output - Webpacker NOT Installed\r\n```                                  Prefix Verb   URI Pattern                                                                                       Controller#Action\r\n                                    ...\r\n                      authenticated_root GET    /                                                                                                 transactions#index\r\n                  transaction_invalidate POST   /transactions/:transaction_id/invalidate(.:format)                                                transactions#invalidate {:transaction_id=>/\\d+/}\r\n               transaction_download_slip GET    /transactions/:transaction_id/download_slip(.:format)                                             transactions#download_slip {:transaction_id=>/\\d+/}\r\n                     export_transactions GET    /transactions/export(.:format)                                                                    transactions#export\r\n                            transactions GET    /transactions(.:format)                                                                           transactions#index\r\n                                         POST   /transactions(.:format)                                                                           transactions#create\r\n                         new_transaction GET    /transactions/new(.:format)                                                                       transactions#new\r\n                           slip_download GET    /slips/:slip_id/download(.:format)                                                                slips#download\r\n                                   slips GET    /slips(.:format)                                                                                  slips#index\r\n                                    slip GET    /slips/:id(.:format)                                                                              slips#show\r\n                                    ...\r\n\r\n\r\n```\r\n\r\n\r\n### Rails routes output - Webpacker Installed\r\n```                                  Prefix Verb   URI Pattern                                                                                       Controller#Action\r\n                                    ...\r\n                      authenticated_root GET    /                                                                                                 transactions#index\r\n                confirmable_transactions GET    /confirmable_transactions(.:format)                                                               nil\r\n                  transaction_invalidate POST   /transactions/:transaction_id/invalidate(.:format)                                                nil {:transaction_id=>/\\d+/}\r\n               transaction_download_slip GET    /transactions/:transaction_id/download_slip(.:format)                                             nil {:transaction_id=>/\\d+/}\r\n                     export_transactions GET    /transactions/export(.:format)                                                                    nil\r\n                            transactions GET    /transactions(.:format)                                                                           nil\r\n                                         POST   /transactions(.:format)                                                                           nil\r\n                         new_transaction GET    /transactions/new(.:format)                                                                       nil\r\n                           slip_download GET    /slips/:slip_id/download(.:format)                                                                nil\r\n                                   slips GET    /slips(.:format)                                                                                  nil\r\n                                    slip GET    /slips/:id(.:format)                                                                              nil\r\n                                    ...\r\n```\r\n\r\n### routes.rb\r\n```\r\n# frozen_string_literal: true\r\n\r\nRails.application.routes.draw do\r\n  ...\r\n  devise_scope :user do\r\n    authenticated :user do\r\n      root 'transactions#index', as: :authenticated_root\r\n    end\r\n\r\n  resources :transactions, only: [:index, :new, :create] do\r\n    post :invalidate,    constraints: { transaction_id: /\\d+/ }\r\n    get  :download_slip, constraints: { transaction_id: /\\d+/ }\r\n\r\n    collection do\r\n      get :export\r\n    end\r\n  end\r\n  ...\r\nend\r\n```\r\n\r\n\r\n### Rspec\r\n\r\nDue to that, a series of tests were broken since some routes to controller and action seemed to be not found. Following is the error that shows up in numerous cases\r\n\r\n```\r\n     Failure/Error: get :index\r\n\r\n     ActionController::UrlGenerationError:\r\n       No route matches {:action=>\"index\", :controller=>\"anonymous\"}\r\n     # /usr/local/rvm/gems/ruby-2.6.3/gems/rails-controller-testing-1.0.5/lib/rails/controller/testing/template_assertions.rb:62:in `process'\r\n     # /usr/local/rvm/gems/ruby-2.6.3/gems/devise-4.7.1/lib/devise/test/controller_helpers.rb:35:in `block in process'\r\n     # /usr/local/rvm/gems/ruby-2.6.3/gems/devise-4.7.1/lib/devise/test/controller_helpers.rb:102:in `catch'\r\n     # /usr/local/rvm/gems/ruby-2.6.3/gems/devise-4.7.1/lib/devise/test/controller_helpers.rb:102:in `_catch_warden'\r\n     # /usr/local/rvm/gems/ruby-2.6.3/gems/devise-4.7.1/lib/devise/test/controller_helpers.rb:35:in `process'\r\n     # /usr/local/rvm/gems/ruby-2.6.3/gems/rails-controller-testing-1.0.5/lib/rails/controller/testing/integration.rb:16:in `block (2 levels) in <module:Integration>'\r\n     # ./spec/controllers/application_controller_spec.rb:43:in `block (3 levels) in <top (required)>'\r\n\r\n```\r\n\r\n### System configuration\r\n**Rails version**: `6.1.3`\r\n**Webpacker version**: `5.2.1`\r\n\r\n**Ruby version**: `2.6.3`\r\n",
           "performed_via_github_app": null
         },
-        {
-          "url": "https://api.github.com/repos/rails/rails/issues/41603",
-          "repository_url": "https://api.github.com/repos/rails/rails",
-          "labels_url": "https://api.github.com/repos/rails/rails/issues/41603/labels{/name}",
-          "comments_url": "https://api.github.com/repos/rails/rails/issues/41603/comments",
-          "events_url": "https://api.github.com/repos/rails/rails/issues/41603/events",
-          "html_url": "https://github.com/rails/rails/pull/41603",
-          "id": 821073828,
-          "node_id": "MDExOlB1bGxSZXF1ZXN0NTgzOTI3NDcz",
-          "number": 41603,
-          "title": "Clear ActiveStorage::Blob column information in migration file",
-          "user": {
-            "login": "ohbarye",
-            "id": 1811616,
-            "node_id": "MDQ6VXNlcjE4MTE2MTY=",
-            "avatar_url": "https://avatars.githubusercontent.com/u/1811616?v=4",
-            "gravatar_id": "",
-            "url": "https://api.github.com/users/ohbarye",
-            "html_url": "https://github.com/ohbarye",
-            "followers_url": "https://api.github.com/users/ohbarye/followers",
-            "following_url": "https://api.github.com/users/ohbarye/following{/other_user}",
-            "gists_url": "https://api.github.com/users/ohbarye/gists{/gist_id}",
-            "starred_url": "https://api.github.com/users/ohbarye/starred{/owner}{/repo}",
-            "subscriptions_url": "https://api.github.com/users/ohbarye/subscriptions",
-            "organizations_url": "https://api.github.com/users/ohbarye/orgs",
-            "repos_url": "https://api.github.com/users/ohbarye/repos",
-            "events_url": "https://api.github.com/users/ohbarye/events{/privacy}",
-            "received_events_url": "https://api.github.com/users/ohbarye/received_events",
-            "type": "User",
-            "site_admin": false
-          },
-          "labels": [
-            {
-              "id": 664533972,
-              "node_id": "MDU6TGFiZWw2NjQ1MzM5NzI=",
-              "url": "https://api.github.com/repos/rails/rails/labels/activestorage",
-              "name": "activestorage",
-              "color": "bfd4f2",
-              "default": false,
-              "description": null
-            }
-          ],
-          "state": "open",
-          "locked": false,
-          "assignee": null,
-          "assignees": [
-      
-          ],
-          "milestone": null,
-          "comments": 2,
-          "created_at": "2021-03-03T12:40:27Z",
-          "updated_at": "2021-03-05T01:16:35Z",
-          "closed_at": null,
-          "author_association": "CONTRIBUTOR",
-          "active_lock_reason": null,
-          "pull_request": {
-            "url": "https://api.github.com/repos/rails/rails/pulls/41603",
-            "html_url": "https://github.com/rails/rails/pull/41603",
-            "diff_url": "https://github.com/rails/rails/pull/41603.diff",
-            "patch_url": "https://github.com/rails/rails/pull/41603.patch"
-          },
-          "body": "This is just a proposal for an improvement. If you feel it's meaningless, I'm okay to withdraw. \r\n\r\n### Summary\r\n\r\nThis pull request attempts to eliminate a possible problem that could happen when calling `ActiveStorage::Blobs` in future migrations.\r\n\r\nAs documented in https://api.rubyonrails.org/classes/ActiveRecord/ModelSchema/ClassMethods.html#method-i-reset_column_information, we can avoid the problem by calling `reset_column_information` before calling the model in the next migration script. \r\n\r\nHowever, I think it's a better practice to call `reset_column_information` after touching a model in advance in order to eliminate a future problem rather than postponing the problem in the future.\r\n\r\n### Other Information\r\n\r\nNothing.\r\n",
-          "performed_via_github_app": null
-        },
-        {
-          "url": "https://api.github.com/repos/rails/rails/issues/41602",
-          "repository_url": "https://api.github.com/repos/rails/rails",
-          "labels_url": "https://api.github.com/repos/rails/rails/issues/41602/labels{/name}",
-          "comments_url": "https://api.github.com/repos/rails/rails/issues/41602/comments",
-          "events_url": "https://api.github.com/repos/rails/rails/issues/41602/events",
-          "html_url": "https://github.com/rails/rails/pull/41602",
-          "id": 821028604,
-          "node_id": "MDExOlB1bGxSZXF1ZXN0NTgzODg5Mzk4",
-          "number": 41602,
-          "title": "Fix rollback of parent destruction with nested dependent:destroy",
-          "user": {
-            "login": "intrip",
-            "id": 1753245,
-            "node_id": "MDQ6VXNlcjE3NTMyNDU=",
-            "avatar_url": "https://avatars.githubusercontent.com/u/1753245?v=4",
-            "gravatar_id": "",
-            "url": "https://api.github.com/users/intrip",
-            "html_url": "https://github.com/intrip",
-            "followers_url": "https://api.github.com/users/intrip/followers",
-            "following_url": "https://api.github.com/users/intrip/following{/other_user}",
-            "gists_url": "https://api.github.com/users/intrip/gists{/gist_id}",
-            "starred_url": "https://api.github.com/users/intrip/starred{/owner}{/repo}",
-            "subscriptions_url": "https://api.github.com/users/intrip/subscriptions",
-            "organizations_url": "https://api.github.com/users/intrip/orgs",
-            "repos_url": "https://api.github.com/users/intrip/repos",
-            "events_url": "https://api.github.com/users/intrip/events{/privacy}",
-            "received_events_url": "https://api.github.com/users/intrip/received_events",
-            "type": "User",
-            "site_admin": false
-          },
-          "labels": [
-            {
-              "id": 107191,
-              "node_id": "MDU6TGFiZWwxMDcxOTE=",
-              "url": "https://api.github.com/repos/rails/rails/labels/activerecord",
-              "name": "activerecord",
-              "color": "0b02e1",
-              "default": false,
-              "description": null
-            }
-          ],
-          "state": "open",
-          "locked": false,
-          "assignee": null,
-          "assignees": [
-      
-          ],
-          "milestone": null,
-          "comments": 0,
-          "created_at": "2021-03-03T11:38:07Z",
-          "updated_at": "2021-03-03T12:38:13Z",
-          "closed_at": null,
-          "author_association": "CONTRIBUTOR",
-          "active_lock_reason": null,
-          "pull_request": {
-            "url": "https://api.github.com/repos/rails/rails/pulls/41602",
-            "html_url": "https://github.com/rails/rails/pull/41602",
-            "diff_url": "https://github.com/rails/rails/pull/41602.diff",
-            "patch_url": "https://github.com/rails/rails/pull/41602.patch"
-          },
-          "body": "### Summary\r\n\r\nWhen a class has a `:belongs_to` relation with `dependent :destroy` enabled nested multiple levels doesn't delete the object if one of his children wasn't deleted.\r\n\r\nExample:\r\n\r\n    class User < ActiveRecord::Base\r\n      belongs_to :user_account, dependent: :destroy\r\n    end\r\n\r\n    class UserAccount < ActiveRecord::Base\r\n      belongs_to :profile, dependent: :destroy\r\n    end\r\n\r\n    class Profile < ActiveRecord::Base\r\n      before_destroy prepend: true do\r\n        throw :abort\r\n      end\r\n    end\r\n\r\n    user = User.create!(user_account: UserAccount.new(profile: Profile.new))\r\n    user.destroy\r\n\r\n    user.destroyed? # expected: false; actual: true;\r\n\r\nFixes #40550\r\n\r\n\r\n\r\n<!-- Provide a general description of the code changes in your pull\r\nrequest... were there any bugs you had fixed? If so, mention them. If\r\nthese bugs have open GitHub issues, be sure to tag them here as well,\r\nto keep the conversation linked together. -->\r\n\r\n\r\n\r\n<!-- If there's anything else that's important and relevant to your pull\r\nrequest, mention that information here. This could include\r\nbenchmarks, or other information.\r\n\r\nIf you are updating any of the CHANGELOG files or are asked to update the\r\nCHANGELOG files by reviewers, please add the CHANGELOG entry at the top of the file.\r\n\r\nFinally, if your pull request affects documentation or any non-code\r\nchanges, guidelines for those changes are [available\r\nhere](https://edgeguides.rubyonrails.org/contributing_to_ruby_on_rails.html#contributing-to-the-rails-documentation)\r\n\r\nThanks for contributing to Rails! -->\r\n",
-          "performed_via_github_app": null
-        },
-        {
-          "url": "https://api.github.com/repos/rails/rails/issues/41597",
-          "repository_url": "https://api.github.com/repos/rails/rails",
-          "labels_url": "https://api.github.com/repos/rails/rails/issues/41597/labels{/name}",
-          "comments_url": "https://api.github.com/repos/rails/rails/issues/41597/comments",
-          "events_url": "https://api.github.com/repos/rails/rails/issues/41597/events",
-          "html_url": "https://github.com/rails/rails/pull/41597",
-          "id": 820412493,
-          "node_id": "MDExOlB1bGxSZXF1ZXN0NTgzMzYwNzI0",
-          "number": 41597,
-          "title": "Add Preloader::Association::LoaderQuery",
-          "user": {
-            "login": "jhawthorn",
-            "id": 131752,
-            "node_id": "MDQ6VXNlcjEzMTc1Mg==",
-            "avatar_url": "https://avatars.githubusercontent.com/u/131752?v=4",
-            "gravatar_id": "",
-            "url": "https://api.github.com/users/jhawthorn",
-            "html_url": "https://github.com/jhawthorn",
-            "followers_url": "https://api.github.com/users/jhawthorn/followers",
-            "following_url": "https://api.github.com/users/jhawthorn/following{/other_user}",
-            "gists_url": "https://api.github.com/users/jhawthorn/gists{/gist_id}",
-            "starred_url": "https://api.github.com/users/jhawthorn/starred{/owner}{/repo}",
-            "subscriptions_url": "https://api.github.com/users/jhawthorn/subscriptions",
-            "organizations_url": "https://api.github.com/users/jhawthorn/orgs",
-            "repos_url": "https://api.github.com/users/jhawthorn/repos",
-            "events_url": "https://api.github.com/users/jhawthorn/events{/privacy}",
-            "received_events_url": "https://api.github.com/users/jhawthorn/received_events",
-            "type": "User",
-            "site_admin": true
-          },
-          "labels": [
-            {
-              "id": 107191,
-              "node_id": "MDU6TGFiZWwxMDcxOTE=",
-              "url": "https://api.github.com/repos/rails/rails/labels/activerecord",
-              "name": "activerecord",
-              "color": "0b02e1",
-              "default": false,
-              "description": null
-            }
-          ],
-          "state": "open",
-          "locked": false,
-          "assignee": null,
-          "assignees": [
-      
-          ],
-          "milestone": null,
-          "comments": 0,
-          "created_at": "2021-03-02T21:38:55Z",
-          "updated_at": "2021-03-05T04:19:43Z",
-          "closed_at": null,
-          "author_association": "MEMBER",
-          "active_lock_reason": null,
-          "pull_request": {
-            "url": "https://api.github.com/repos/rails/rails/pulls/41597",
-            "html_url": "https://github.com/rails/rails/pull/41597",
-            "diff_url": "https://github.com/rails/rails/pull/41597.diff",
-            "patch_url": "https://github.com/rails/rails/pull/41597.patch"
-          },
-          "body": "Follow up to #41385 \r\n\r\nThis class represents the query a `Preloader::Association` uses to load its records. This replaces the previous concept of a grouping_key and serves both to group `Preloader::Associations` by their query and to run the query to load the records (which nicely avoids using `.first`).\r\n\r\nThis should not change any functionality but should be slightly faster due to being able to avoid calling `scope.to_sql` unless necessary.\r\n\r\ncc @dinahshi @eileencodes @HParker \r\n",
-          "performed_via_github_app": null
-        }
-      
     ])
   }
 

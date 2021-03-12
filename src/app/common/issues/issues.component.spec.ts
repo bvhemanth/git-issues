@@ -73,31 +73,11 @@ fdescribe('IssuesComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(IssuesComponent);
     component = fixture.componentInstance;
-    //fixture.detectChanges();
-    component.data=  data;
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-  it('should display data',()=>{
-   
-    fixture.detectChanges();
-    expect(component.data.number).toEqual(41657)
-  });
-
-  it('should click card',fakeAsync(()=>{
-      component.data=  data;
-      fixture.detectChanges();
-      spyOn(component, 'route');
-      let btn = fixture.debugElement.query(By.css('#card'));
-      btn.triggerEventHandler('click', null);
-      tick(); 
-      fixture.detectChanges();
-      expect(component.route).toHaveBeenCalled();
-    }))
-  
-
 });
 
 
