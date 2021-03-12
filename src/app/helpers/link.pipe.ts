@@ -21,7 +21,7 @@ export class LinkPipe implements PipeTransform {
         if (t.startsWith("@") && t.length>1)
           {
             let username=t.split("@")[1]
-            stylizedText += `<a href="https://github.com/${username}" target="_blank">${t}</a> `;
+            stylizedText += `<a style="text-decoration:none;color:#579ed3;" href="https://github.com/${username}" target="_blank">${t}</a> `;
           }
           else{
             stylizedText += t + " ";

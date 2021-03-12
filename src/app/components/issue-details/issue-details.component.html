@@ -61,9 +61,9 @@
             <div class="description">
                 <a [href]="issueDetails?.user?.html_url" target="_blank" [title]="issueDetails?.user?.login">
                     <img class="description__body__avatar" [src]="issueDetails?.user?.avatar_url" [alt]="issueDetails?.user.type"/>
-                    @{{issueDetails?.user?.login}}
+                    {{issueDetails?.user?.login}}
                 </a>
-                <h4>
+                <h4 class="description__title">
                     Summary:
                 </h4>  
                 <p class="description__body">   
@@ -71,7 +71,7 @@
                 </p>
 
                 <ng-container *ngIf="issueDetails?.comments">
-                    <b>Comments:</b>
+                    <b class="description__title">Comments:</b>
                     <ul class="timeline">
                         <li class="node" *ngFor="let comment of comments" >
                             <img class="comment-img" [src]="comment.user.avatar_url"  [alt]="comment.user.login"/> 

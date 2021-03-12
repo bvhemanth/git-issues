@@ -23,6 +23,9 @@
         flex: 70%;
         word-break: break-all;
         text-align: justify;
+        &__title{
+            color: #2a2d52;
+        }
         &__body{
             font-size: 0.875rem;
             position: relative;
@@ -31,6 +34,10 @@
                 height: 2.5rem;
                 border: 2px solid #2a2d52;            
             }
+        }
+        a{
+            text-decoration: none;
+            color:#579ed3;
         }
     }
     .info{
@@ -88,4 +95,4 @@
     position: absolute;
     top: 0rem;
     left: -.5rem;
-  }
+}
