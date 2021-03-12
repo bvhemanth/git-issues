@@ -34,7 +34,7 @@
                         Created
                     </div>
                     <div>
-                        {{issueDetails?.created_at | date}}
+                        {{issueDetails?.created_at | date:'short'}}
                     </div>
                 </div>
                 
@@ -43,7 +43,7 @@
                         Update
                     </div>
                     <div>
-                        {{issueDetails?.updated_at | date}}
+                        {{issueDetails?.updated_at | date:'short'}}
                     </div>
                  </div>
                  <div class="info__item">
@@ -54,17 +54,31 @@
                         Not Yet
                     </ng-container>
                     <div>
-                        {{issueDetails?.closed_at | date}}
+                        {{issueDetails?.closed_at | date:'short'}}
+                    </div>
+                 </div>
+
+                 <div class="info__item">
+                    <div class="info__item__subtitle">
+                        Milestone
+                    </div>
+                    <ng-container *ngIf="!issueDetails?.milestone">
+                        No
+                    </ng-container>
+                    <div>
+                        {{issueDetails?.milestone?.description}}
                     </div>
                  </div>
             </div>
             <div class="description">
-                <b>Summary:</b>   
+                <a [href]="issueDetails?.user?.html_url" target="_blank" [title]="issueDetails?.user?.login">
+                    <img class="description__body__avatar" [src]="issueDetails?.user?.avatar_url" [alt]="issueDetails?.user.type"/>
+                    @{{issueDetails?.user?.login}}
+                </a>
+                <h4>
+                    Summary:
+                </h4>  
                 <p class="description__body">   
-                    
-                    <a [href]="issueDetails?.user?.html_url" target="_blank" [title]="issueDetails?.user?.login">
-                        <img class="description__body__avatar" [src]="issueDetails?.user?.avatar_url" [alt]="issueDetails?.user.type"/>
-                    </a>
                     {{issueDetails?.body}}
                 </p>
 
