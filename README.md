@@ -20,6 +20,11 @@ step 4: `sudo ng serve --open`
 now the project is ready to see on `browser`
 
 
+
+"dafault list page with 25 records and increament of 25 when you react scroll end , if you click on any card it ll redirect to particular issue details page"
+
+
+
 # test cases
 
 by defaul it ll show list page with approproate testcases
