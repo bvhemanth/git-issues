@@ -2,6 +2,13 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.0.5.
 
+### live link
+
+https://git-issues-sigma.vercel.app/
+
+
+### steps to follow
+
 step 1: use `git clone` to download project 
 
 step 2: then go to folder
@@ -15,7 +22,10 @@ now the project is ready to see on `browser`
 
 # test cases
 
-`ng test --code-coverage`
+by defaul it ll show list page with approproate testcases
+
+>ng test --code-coverage  
+
 
 tested with two different pages with two ways
 
