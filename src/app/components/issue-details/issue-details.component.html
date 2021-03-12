@@ -53,20 +53,8 @@
                     <ng-container *ngIf="!issueDetails?.closed_at">
                         Not Yet
                     </ng-container>
-                    <div>
+                    <div *ngIf="issueDetails?.closed_at">
                         {{issueDetails?.closed_at | date:'short'}}
-                    </div>
-                 </div>
-
-                 <div class="info__item">
-                    <div class="info__item__subtitle">
-                        Milestone
-                    </div>
-                    <ng-container *ngIf="!issueDetails?.milestone">
-                        No
-                    </ng-container>
-                    <div>
-                        {{issueDetails?.milestone?.description}}
                     </div>
                  </div>
             </div>
