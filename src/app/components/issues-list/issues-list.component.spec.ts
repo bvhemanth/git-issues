@@ -33,14 +33,16 @@ fdescribe('IssuesListComponent', () => {
   });
 
   it('shoud call servive and get data',()=>{
+    spyOn(component,'getlist');
     component.ngOnInit();
     fixture.detectChanges();
-    expect(component.issues.length).toEqual(25);
+    expect(component.getlist).toHaveBeenCalled();
   })
-  it('should call attach data on scrol',()=>{
+  it('should call attach data api on scroll',()=>{
+    spyOn(component,'getlist');
     window.dispatchEvent(new Event('scroll'));
     fixture.detectChanges();
-    expect(component.issues.length).toEqual(30);
+    expect(component.getlist).toHaveBeenCalled();
   })
 });
 

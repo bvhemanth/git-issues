@@ -57,7 +57,7 @@
 }
 
 .comment-img{
-    height: 2.5rem;
+    height: 2rem;
     border-radius: 100%;
     border: 2px solid #2a2d52;
 }
@@ -76,6 +76,7 @@
     padding-left: .5rem;
     padding-bottom: 1.5rem;
     position: relative;
+    font-size: .875rem;
   }
 .node::before {
     content: "";

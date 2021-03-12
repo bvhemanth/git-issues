@@ -62,7 +62,7 @@
                 <b>Summary:</b>   
                 <p class="description__body">   
                     
-                    <a [href]="issueDetails.user.html_url" target="_blank">
+                    <a [href]="issueDetails.user.html_url" target="_blank" [title]="issueDetails.user.login">
                         <img class="description__body__avatar" [src]="issueDetails.user.avatar_url" [alt]="issueDetails.user.type"/>
                     </a>
                     {{issueDetails.body}}
@@ -73,7 +73,7 @@
                     <ul class="timeline">
                         <li class="node" *ngFor="let comment of comments" >
                             <img class="comment-img" [src]="comment.user.avatar_url"  [alt]="comment.user.login"/> 
-                            <span class="comment-date">Commented on {{comment.updated_at | date:'short'}}</span>
+                            <a [href]="comment.user.html_url" [title]="comment.user.login" target="_blank">{{comment.user.login}}</a>, &nbsp;<span class="comment-date">Commented on {{comment.updated_at | date:'short'}}</span>
                             <p class="comment-text" [innerHTML]="comment.body | link:comment.user.html_url"></p>
                         </li>
                     </ul>    

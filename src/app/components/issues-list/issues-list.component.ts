@@ -52,10 +52,8 @@ export class IssuesListComponent implements OnInit , OnDestroy{
   }
   
   attachData(){
-    
     this.page++;
     this.getlist(this.page);
-    //return true;   
   }
 
   ngOnDestroy() {
