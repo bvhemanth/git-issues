@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
+import { Component, OnInit, HostListener, OnDestroy, ViewChild } from '@angular/core';
 import { GetIssuesService } from 'src/app/services/get-issues.service';
 import { Issue } from 'src/app/models/issue.interface';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -15,6 +15,8 @@ export class IssuesListComponent implements OnInit , OnDestroy{
   loader:boolean=true;
   per_page=25;
   page=1;
+  lazy:boolean=false;
+  @ViewChild('wrapper') wrapper
   private readonly destroy$ = new Subject();
 
   @HostListener("window:scroll", ['$event'])
@@ -27,10 +29,10 @@ export class IssuesListComponent implements OnInit , OnDestroy{
   constructor(private get : GetIssuesService) { }
 
   ngOnInit(): void {
+    this.loader=true;
     this.getlist(this.page);
   }
   getlist(pagenumber){
-    this.loader=true;
     this.get.getData(pagenumber,this.per_page).pipe(
       takeUntil(this.destroy$),
       debounceTime(300,),
@@ -42,17 +44,19 @@ export class IssuesListComponent implements OnInit , OnDestroy{
           let list= data; 
           this.issues.push(...JSON.parse(JSON.stringify(list))); 
           this.loader=false;
+          this.lazy=false;
         }
       }
     );
   }
 
   bottomReached(): boolean {
-    return (window.innerHeight + window.scrollY) >= document.body.scrollHeight;
+    return (window.innerHeight + window.scrollY) >= Math.floor(document.body.scrollHeight);
   }
   
   attachData(){
     this.page++;
+    this.lazy=true;
     this.getlist(this.page);
   }
 

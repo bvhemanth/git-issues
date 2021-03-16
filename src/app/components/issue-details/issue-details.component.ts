@@ -37,14 +37,11 @@ export class IssueDetailsComponent implements OnInit {
         this.loader=false;
     }) .catch(err => { console.log(err) });
   }
-
   getDetails(){
    return this.getService.getIssueDetails(this.route.snapshot.params.id)
   }
-
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();//to destroy service when component ends
   }
-
 }

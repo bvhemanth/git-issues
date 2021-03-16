@@ -9,15 +9,20 @@ import { Router } from '@angular/router';
 export class IssuesComponent implements OnInit {
   @Input('data') data;
   
-  constructor(private router: Router) { }
+  constructor(private router: Router) {
+   
+   }
 
   ngOnInit(): void {
+    this.data['body'] = this.limit(this.data.body);
   }
   route(data){
     this.router.navigateByUrl(`/issue/${data.number}`, { state: { item: data }});
   }
 
   limit(s){
+    console.log(s);
+    if(s){
     let s_split = s.split(/\s+/);
     let word_count = 0;
     let result = "";
@@ -27,9 +32,9 @@ export class IssuesComponent implements OnInit {
         word_count+=(y.length+1);
         if(word_count>=140) return x;
         else return x+" "+y;
-      }
-      , "").substring(1);
-   
+      },"").substring(1);
+      console.log(result.length);
       return result;
+    }
   }
 }

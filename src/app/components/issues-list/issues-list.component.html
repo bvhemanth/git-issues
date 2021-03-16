@@ -1,9 +1,12 @@
 <div class="wrapper">
     <h2>Issues ({{issues.length}})</h2>
-    <div class="list">
+    <div class="list" id="list">
         <div *ngFor="let data of issues">
             <app-issues [data]="data"></app-issues>
         </div>
+    </div>
+    <div *ngIf="lazy">
+       loading ..
     </div>
     <div class="count">
         {{this.issues.length}}
@@ -14,4 +17,5 @@
     <div class="loader">
     </div>
 </div>
+
 
